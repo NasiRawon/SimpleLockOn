@@ -57,7 +57,7 @@ namespace Tralala
 	//// menu implementations
 
 	// 30
-	class IMenu : public FxDelegateHandler
+	class IMenu
 	{
 	public:
 		IMenu();
@@ -77,6 +77,7 @@ namespace Tralala
 		virtual void	Unk_07(void) {}
 		virtual void	Unk_08(void) {}
 
+		volatile SInt32	refCount;	// 08
 		GFxMovieView	* view;		// 10 - init'd to 0, a class, virtual fn 0x228 called in dtor
 		UInt8			unk0C;		// 18 - init'd to 3
 		UInt8			pad19[3];	// 19
@@ -84,6 +85,34 @@ namespace Tralala
 		UInt32			unk14;		// 20 - init'd to 0x12
 		UInt32			pad24;		// 24 
 		GRefCountBase	* unk18;	// 28 - holds a reference
+
+		// redirect new delete
+		static void* operator new(std::size_t size)
+		{
+			return ScaleformHeap_Allocate(size);
+		}
+
+		static void* operator new(std::size_t size, const std::nothrow_t&)
+		{
+			return ScaleformHeap_Allocate(size);
+		}
+
+		// placement new
+		static void* operator new(std::size_t size, void* ptr)
+		{
+			return ptr;
+		}
+
+		static void operator delete(void* ptr)
+		{
+			ScaleformHeap_Free(ptr);
+		}
+
+		// placement delete
+		static void operator delete(void*, void*)
+		{
+			//
+		}
 	};
 	STATIC_ASSERT(offsetof(IMenu, view) == 0x10);
 

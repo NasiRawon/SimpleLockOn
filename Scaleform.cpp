@@ -5,11 +5,15 @@
 
 namespace Tralala
 {
+	LockOnMenu* LockOnMenu::m_instance = nullptr;
+
 	LockOnMenu::LockOnMenu() : 
 		m_menuName("LockOnMenu"),
 		m_refTarget(nullptr), 
 		m_isLockOn(false)
 	{
+		_MESSAGE("LockOnMenu ctor is called");
+
 		if (GFxLoader::GetSingleton()->LoadMovie(this, &view, "SimpleLockOn", 0, 0.0))
 		{
 			flags = 0x18902;
@@ -20,6 +24,8 @@ namespace Tralala
 
 	LockOnMenu::~LockOnMenu()
 	{
+		_MESSAGE("LockOnMenu dtor is called");
+
 		m_isLockOn = false;
 		m_refTarget = nullptr;
 		m_menuName.Release();

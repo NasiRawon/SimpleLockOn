@@ -11,6 +11,7 @@ namespace Tralala
 	uintptr_t g_isInMenuMode1Addr = 0;
 	uintptr_t g_isInMenuMode2Addr = 0;
 	uintptr_t g_crc64Addr = 0;
+	uintptr_t g_menuCtorAddr = 0;
 	uintptr_t g_menuDtorAddr = 0;
 	uintptr_t g_stringHoldAddr = 0;
 
@@ -40,6 +41,9 @@ namespace Tralala
 		const std::array<BYTE, 8> crcpattern = { 0x49, 0xC1, 0xE8, 0x08, 0x41, 0x0F, 0xB6, 0xC2 };
 		g_crc64Addr = (uintptr_t)scan_memory(crcpattern, 0xAF, false);
 
+		const std::array<BYTE, 7> ctorpattern = { 0x89, 0x41, 0x1C, 0xC6, 0x41, 0x18, 0x03 };
+		g_menuCtorAddr = (uintptr_t)scan_memory(ctorpattern, 0x21, false);
+
 		const std::array<BYTE, 7> dtorpattern = { 0x4C, 0x8B, 0x86, 0x50, 0x05, 0x03, 0x00 };
 		g_menuDtorAddr = (uintptr_t)scan_memory_data(dtorpattern, 0xE1, true, 0x1, 0x5);
 
@@ -47,13 +51,12 @@ namespace Tralala
 		g_stringHoldAddr = (uintptr_t)scan_memory_data(strpattern, 0x7, true, 0x3, 0x7);
 	}
 
-	IMenu::IMenu() :
-		view(nullptr),
-		unk0C(3),
-		flags(0),
-		unk14(0x12),
-		unk18(nullptr)
+	IMenu::IMenu()
 	{
+		typedef IMenu*(*IMenu_ctor_t)(IMenu*);
+		IMenu_ctor_t IMenu_ctor = (IMenu_ctor_t)g_menuCtorAddr;
+
+		IMenu_ctor(this);
 	}
 
 	IMenu::~IMenu()

@@ -8,6 +8,8 @@ namespace Tralala
 	class LockOnMenu : 
 		public IMenu
 	{
+		static LockOnMenu* m_instance;
+
 		BSFixedString m_menuName;
 		TESObjectREFR* m_refTarget;
 		bool m_isLockOn;
@@ -35,10 +37,13 @@ namespace Tralala
 			return m_refTarget;
 		}
 
+		// thread-unsafe but works fine
 		static IMenu* GetSingleton()
 		{
-			static LockOnMenu instance;
-			return &instance;
+			if (!m_instance)
+				m_instance = new LockOnMenu;
+
+			return m_instance;
 		}
 	};
 }

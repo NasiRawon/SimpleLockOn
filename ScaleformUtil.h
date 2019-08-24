@@ -39,7 +39,7 @@ namespace Tralala
 		virtual ~GRefCountImplCore() { }
 
 		//	void	** _vtbl;			// 00
-		volatile SInt32	refCount;	// 04
+		volatile SInt32	refCount;	// 08
 
 		// redirect new/delete to the scaleform heap
 		static void * operator new(std::size_t size)
