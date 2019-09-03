@@ -19,7 +19,15 @@ namespace Tralala
 			flags = 0x18902;
 			unk0C = 2;
 			unk14 = 0x12;
+
+			view->GetVariable(&m_root, "_root.widgetHolder");
 		}
+
+		PlayerControls* pControls = PlayerControls::GetSingleton();
+		if (pControls)
+			m_lookHandler = pControls->lookHandler;
+
+		UIManager::GetSingleton()->AddMessage(&m_menuName, UIMessage::kMessage_Open, nullptr);
 	}
 
 	LockOnMenu::~LockOnMenu()
@@ -33,13 +41,8 @@ namespace Tralala
 
 	void LockOnMenu::Open(TESObjectREFR* target)
 	{
-		PlayerControls* pControls = PlayerControls::GetSingleton();
-		if (pControls) 
-		{
-			PlayerInputHandler* lookHandler = pControls->lookHandler;
-			lookHandler->enabled = 0;
-		}
-
+		
+		m_lookHandler->enabled = false;
 		m_refTarget = target;
 		m_isLockOn = true;
 		
@@ -48,28 +51,28 @@ namespace Tralala
 
 	void LockOnMenu::Close()
 	{
-		PlayerControls* pControls = PlayerControls::GetSingleton();
-		if (pControls) 
-		{
-			PlayerInputHandler* lookHandler = pControls->lookHandler;
-			lookHandler->enabled = 1;
-		}
 
+		m_lookHandler->enabled = true;
 		m_refTarget = nullptr;
 		m_isLockOn = false;
 
 		UIManager::GetSingleton()->AddMessage(&m_menuName, UIMessage::kMessage_Close, nullptr);
 	}
 
+	bool LockOnMenu::SetTargetPosition(GFxValue* args)
+	{
+		return m_root.Invoke("setTargetPos", nullptr, args, 3);
+	}
+
 	void LockOnMenu::OnMenuOpen()
 	{
-		if (view)
+		if (view && m_refTarget)
 		{
 			const char * targetName = m_refTarget->GetReferenceName();
 			GFxValue args[1];
 			args[0].SetString(targetName);
 
-			view->Invoke("_root.widgetHolder.setTargetName", nullptr, args, 1);
+			m_root.Invoke("setTargetName", nullptr, args, 1);
 		}
 	}
 
@@ -80,7 +83,7 @@ namespace Tralala
 			GFxValue args[1];
 			args[0].SetString("");
 
-			view->Invoke("_root.widgetHolder.setTargetName", nullptr, args, 1);
+			m_root.Invoke("setTargetName", nullptr, args, 1);
 		}
 	}
 

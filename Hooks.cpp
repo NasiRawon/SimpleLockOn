@@ -200,7 +200,7 @@ namespace Tralala
 				args[0].SetNumber(g_targetPosX);
 				args[1].SetNumber(g_targetPosY);
 				args[2].SetNumber(g_targetDist);
-				view->Invoke("_root.widgetHolder.setTargetPos", nullptr, args, 3);
+				lockOnMenu->SetTargetPosition(args);
 
 				if (!view->GetVisible())
 					view->SetVisible(true);
